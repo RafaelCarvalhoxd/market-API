@@ -5,6 +5,7 @@ const productRouter = require('./src/routes/productRoute');
 const port = 3000;
 
 const app = express();
+app.use(express.json())
 
 app.use(categoryRouter)
 app.use(productRouter)
