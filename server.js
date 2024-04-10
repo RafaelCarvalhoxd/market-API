@@ -1,7 +1,7 @@
 const express = require('express');
-const database = require('./services/database');
-const categoryRouter = require('./routes/categoryRoute')
-const productRouter = require('./routes/productRoute')
+const database = require('./src/services/database');
+const categoryRouter = require('./src/routes/categoryRoute')
+const productRouter = require('./src/routes/productRoute')
 const port = 3000;
 
 const app = express();
