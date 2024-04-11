@@ -12,7 +12,7 @@ exports.getAllProducts = async (req, res) => {
                     
                 FROM products p`
         )
-        res.status(200)
+        res.status(200) 
             .json({ succes: true, data: result.rows })
     } catch (error) {
         console.log(error)
@@ -23,25 +23,36 @@ exports.getAllProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
     try {
-
         if (!req.body.name) {
-            res.status(422)
-                .json({succes: false, error: `Name is required!`})
+            return res.status(422)
+                .json({ error: 'Name is required' })
         }
+
         if (!req.body.price) {
-            res.status(422)
-                .json({succes: false, error: `Price is required!`})
+            return res.status(422)
+                .json({ error: 'Price is required' })
         }
 
         if (!req.body.category_id) {
-            res.status(422)
-                .json({succes: false, error: `Category id is required!`})
+            return res.status(422)
+                .json({ error: 'Category id is required' })
+        } else {
+            const existsResult = await database.pool.query({
+                text: 'SELECT EXISTS (SELECT * FROM category WHERE id = $1)',
+                values: [req.body.category_id]
+            })
+
+            if (!existsResult.rows[0].exists) {
+                return res.status(422)
+                    .json({ error: 'Category id not found' })
+            }
         }
+
         const result = await database.pool.query({
             text: `
-            INSERT INTO products (name, description, price, currency, quantity, active, category_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING *`,
+                INSERT INTO product (name, description, price, currency, quantity, active, category_id)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                RETURNING *`,
             values: [
                 req.body.name,
                 req.body.description ? req.body.description : null,
@@ -53,11 +64,11 @@ exports.createProduct = async (req, res) => {
             ]
         })
 
-         res.status(201)
-                .json({succes: true, data: result.rows[0]})
+        return res.status(201)
+            .json(result.rows[0])
+        
     } catch (error) {
-        console.log(error)
-        res.status(500)
-            .json({ succes: false, error: 'Something went wrong' })
+        return res.status(500)
+            .json({ error: error.message })
     }
 }
