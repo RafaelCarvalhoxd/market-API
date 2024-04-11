@@ -41,3 +41,23 @@ exports.createCategory = async (req, res) => {
             .json({ error: error.message })
     }
 }
+
+exports.updateCategory = async (req, res) => {
+    try {
+        const result = await database.pool.query({
+            text: `
+                UPDATE category
+                SET name = $1, updated_date = CURRENT_TIMESTAMP
+                WHERE id = $2
+                RETURNING *
+            `,
+            values: [req.body.name, req.params.id]
+        })
+
+        return res.status(200)
+            .json(result.rows[0])
+    } catch (error) {
+        return res.status(500)
+            .json({error: error.message})
+    }
+}
