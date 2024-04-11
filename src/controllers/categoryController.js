@@ -1,6 +1,5 @@
 const database = require('../services/database')
 const { validateName } = require('../utils/validationFields');
-const { checkCategoryAlreadyExists } = require('../utils/validationUtils')
 
 exports.getAllCategories = async (req, res) => {
     try {
@@ -18,9 +17,12 @@ exports.createCategory = async (req, res) => {
     try {
         validateName(req, res);
 
-        const categoryExists = checkCategoryAlreadyExists(req.body.name)
+        const existsResult = await database.pool.query({
+            text: 'SELECT EXISTS (SELECT * FROM category WHERE name = $1)',
+            values: [req.body.name]
+        })
 
-        if (categoryExists) {
+        if (existsResult.rows[0].exists) {
             return res.status(409).json({ error: `Category ${req.body.name} already exists` })
         }
 
@@ -39,9 +41,12 @@ exports.updateCategory = async (req, res) => {
     try {
         validateName(req, res)
 
-        const categoryExists = checkCategoryAlreadyExists(req.body.name)
+        const existsResult = await database.pool.query({
+            text: 'SELECT EXISTS (SELECT * FROM category WHERE name = $1)',
+            values: [req.body.name]
+        })
 
-        if (categoryExists) {
+        if (existsResult.rows[0].exists) {
             return res.status(409).json({ error: `Category ${req.body.name} already exists` })
         }
 
@@ -54,6 +59,10 @@ exports.updateCategory = async (req, res) => {
             `,
             values: [req.body.name, req.params.id]
         })
+
+         if (result.rowCount == 0) {
+            return res.status(404).json({ error: 'Category not found' })
+        } 
 
         return res.status(200).json(result.rows[0])
     } catch (error) {
