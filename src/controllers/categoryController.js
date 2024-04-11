@@ -1,4 +1,6 @@
 const database = require('../services/database')
+const { validateName } = require('../utils/validationFields');
+const { checkCategoryAlreadyExists } = require('../utils/validationUtils')
 
 exports.getAllCategories = async (req, res) => {
     try {
@@ -14,19 +16,12 @@ exports.getAllCategories = async (req, res) => {
 
 exports.createCategory = async (req, res) => {
     try {
-        if (!req.body.name) {
-            return res.status(422)
-                .json({ error: 'Name is required' })
-        }
+        validateName(req, res);
 
-        const existsResult = await database.pool.query({
-            text: 'SELECT EXISTS (SELECT * FROM category WHERE name = $1)',
-            values: [req.body.name]
-        })
+        const categoryExists = checkCategoryAlreadyExists(req.body.name)
 
-        if (existsResult.rows[0].exists) {
-            return res.status(409)
-                .json({ error: `Category ${req.body.name} already exists` })
+        if (categoryExists) {
+            return res.status(409).json({ error: `Category ${req.body.name} already exists` })
         }
 
         const result = await database.pool.query({
@@ -34,16 +29,22 @@ exports.createCategory = async (req, res) => {
             values: [req.body.name]
         })
 
-        return res.status(201)
-            .json(result.rows[0])
+        return res.status(201).json(result.rows[0])
     } catch (error) {
-        return res.status(500)
-            .json({ error: error.message })
+        return res.status(500).json({ error: error.message })
     }
 }
 
 exports.updateCategory = async (req, res) => {
     try {
+        validateName(req, res)
+
+        const categoryExists = checkCategoryAlreadyExists(req.body.name)
+
+        if (categoryExists) {
+            return res.status(409).json({ error: `Category ${req.body.name} already exists` })
+        }
+
         const result = await database.pool.query({
             text: `
                 UPDATE category
@@ -54,10 +55,8 @@ exports.updateCategory = async (req, res) => {
             values: [req.body.name, req.params.id]
         })
 
-        return res.status(200)
-            .json(result.rows[0])
+        return res.status(200).json(result.rows[0])
     } catch (error) {
-        return res.status(500)
-            .json({error: error.message})
+        return res.status(500).json({error: error.message})
     }
 }
