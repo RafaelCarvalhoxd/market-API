@@ -11,7 +11,7 @@ exports.getAllCategories = async (req, res) => {
         res.status(500)
             .json({ success: false, error: 'Something went wrong' });
     }
-}
+};
 
 exports.createCategory = async (req, res) => {
     try {
@@ -35,7 +35,7 @@ exports.createCategory = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message })
     }
-}
+};
 
 exports.updateCategory = async (req, res) => {
     try {
@@ -60,15 +60,15 @@ exports.updateCategory = async (req, res) => {
             values: [req.body.name, req.params.id]
         })
 
-         if (result.rowCount == 0) {
+        if (result.rowCount == 0) {
             return res.status(404).json({ error: 'Category not found' })
-        } 
+        }
 
         return res.status(200).json(result.rows[0])
     } catch (error) {
-        return res.status(500).json({error: error.message})
+        return res.status(500).json({ error: error.message })
     }
-}
+};
 
 exports.deleteCategory = async (req, res) => {
     try {
@@ -81,11 +81,11 @@ exports.deleteCategory = async (req, res) => {
             return res.status(404).json({ error: 'Category not found' })
         }
 
-          return res.status(200).json({ success: true, message: 'Product deleted' })
+        return res.status(200).json({ success: true, message: 'Product deleted' })
     } catch (error) {
-        return res.status(500).json({error: error.message})
+        return res.status(500).json({ error: error.message })
     }
-}
+};
 
 exports.getCategoryById = async (req, res) => {
     try {
@@ -102,4 +102,4 @@ exports.getCategoryById = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
-}
+};
