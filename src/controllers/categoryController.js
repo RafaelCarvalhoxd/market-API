@@ -69,3 +69,37 @@ exports.updateCategory = async (req, res) => {
         return res.status(500).json({error: error.message})
     }
 }
+
+exports.deleteCategory = async (req, res) => {
+    try {
+        const result = await database.pool.query({
+            text: 'DELETE FROM category WHERE id = $1 RETURNING *',
+            values: [req.params.id]
+        })
+
+        if (result.rowCount == 0) {
+            return res.status(404).json({ error: 'Category not found' })
+        }
+
+          return res.status(200).json({ success: true, message: 'Product deleted' })
+    } catch (error) {
+        return res.status(500).json({error: error.message})
+    }
+}
+
+exports.getCategoryById = async (req, res) => {
+    try {
+        const result = await database.pool.query({
+            text: 'SELECT * FROM category WHERE id = $1',
+            values: [req.params.id]
+        })
+
+        if (result.rowCount == 0) {
+            return res.status(404).json({ error: 'Category not found' })
+        }
+
+        return res.status(200).json(result.rows[0])
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
