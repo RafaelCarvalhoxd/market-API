@@ -16,7 +16,7 @@ exports.getAllProducts = async (req, res) => {
         res.status(200).json({ succes: true, data: result.rows })
     } catch (error) {
         console.log(error)
-        res.status(500).json({ succes: false, error: 'Something went wrong' })
+        res.status(500).json({ succes: false, error: 'Server error!' })
     }
 }
 
@@ -32,7 +32,7 @@ exports.createProduct = async (req, res) => {
         });
 
         if (!existsResult.rows[0].exists) {
-            return res.status(422).json({ error: 'Category id not found' });
+            return res.status(422).json({ succes: false, error: 'Category id not found' });
         }
 
         const result = await database.pool.query({
@@ -52,16 +52,16 @@ exports.createProduct = async (req, res) => {
             ]
         });
 
-        return res.status(201).json(result.rows[0]);
+        return res.status(201).json({ succes: true, data: result.rows[0] });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ succes: false, error: 'Server error!' });
     }
 };
 
 exports.uptadeProduct = async (req, res) => {
     try {
          if (!req.body.name || !req.body.description || !req.body.price || !req.body.currency || !req.body.quantity || !req.body.active || !req.body.category_id) {
-            return res.status(422).json({ error: 'All fields are required' })
+            return res.status(422).json({ succes: false, error: 'All fields are required' })
         }
 
         const existsResult = await database.pool.query({
@@ -70,7 +70,7 @@ exports.uptadeProduct = async (req, res) => {
         });
 
         if (!existsResult.rows[0].exists) {
-            return res.status(422).json({ error: 'Category id not found' });
+            return res.status(422).json({ succes: false, error: 'Category id not found' });
         }
 
         const result = await database.pool.query({
@@ -93,13 +93,13 @@ exports.uptadeProduct = async (req, res) => {
         })
 
         if (result.rowCount == 0) {
-            return res.status(404).json({ error: 'Product not found' })
+            return res.status(404).json({ succes: false, error: 'Product not found' })
         } 
 
-        return res.status(200).json(result.rows[0]);
+        return res.status(200).json({ succes: true, data: result.rows[0]} );
 
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 }
 
@@ -111,12 +111,12 @@ exports.deleteProduct = async (req, res) => {
         })
 
         if (result.rowCount == 0) {
-            return res.status(404).json({ error: 'Product not found' })
+            return res.status(404).json({ succes: false, error: 'Product not found' })
         }
 
         return res.status(200).json({ success: true, message: 'Product deleted' })
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 }
 
@@ -128,12 +128,12 @@ exports.getProductById = async (req, res) => {
         })
 
         if (result.rowCount == 0) {
-            return res.status(404).json({ error: 'Product not found' })
+            return res.status(404).json({ succes: false, error: 'Product not found' })
         }
 
-        return res.status(200).json(result.rows[0])
+        return res.status(200).json({ succes: true, data: result.rows[0]})
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 }
 
@@ -145,12 +145,12 @@ exports.getProductByCategory = async (req, res) => {
         })
 
         if (result.rowCount == 0) {
-            return res.status(404).json({ error: 'Product not found' })
+            return res.status(404).json({ succes: false, error: 'Product not found' })
         }
 
-        return res.status(200).json(result.rows)
+        return res.status(200).json({ succes: true, data: result.rows})
 
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 };

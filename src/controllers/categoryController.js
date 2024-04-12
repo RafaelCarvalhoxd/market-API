@@ -4,12 +4,9 @@ const { validateName } = require('../utils/validationFields');
 exports.getAllCategories = async (req, res) => {
     try {
         const result = await database.pool.query('SELECT * FROM category');
-        res.status(200)
-            .json({ succes: true, data: result.rows });
+        res.status(200).json({ succes: true, data: result.rows });
     } catch (error) {
-        console.log(error)
-        res.status(500)
-            .json({ success: false, error: 'Something went wrong' });
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 };
 
@@ -23,7 +20,7 @@ exports.createCategory = async (req, res) => {
         })
 
         if (existsResult.rows[0].exists) {
-            return res.status(409).json({ error: `Category ${req.body.name} already exists` })
+            return res.status(409).json({ succes: false, error: `Category ${req.body.name} already exists` })
         }
 
         const result = await database.pool.query({
@@ -31,9 +28,9 @@ exports.createCategory = async (req, res) => {
             values: [req.body.name]
         })
 
-        return res.status(201).json(result.rows[0])
+        return res.status(201).json({ succes: true, data: result.rows[0] });
     } catch (error) {
-        return res.status(500).json({ error: error.message })
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 };
 
@@ -47,7 +44,7 @@ exports.updateCategory = async (req, res) => {
         })
 
         if (existsResult.rows[0].exists) {
-            return res.status(409).json({ error: `Category ${req.body.name} already exists` })
+            return res.status(409).json({ succes: false, error: `Category ${req.body.name} already exists` })
         }
 
         const result = await database.pool.query({
@@ -61,12 +58,12 @@ exports.updateCategory = async (req, res) => {
         })
 
         if (result.rowCount == 0) {
-            return res.status(404).json({ error: 'Category not found' })
+            return res.status(404).json({ succes: false, error: 'Category not found' })
         }
 
-        return res.status(200).json(result.rows[0])
+        return res.status(200).json({ succes: true, data: result.rows[0] });
     } catch (error) {
-        return res.status(500).json({ error: error.message })
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 };
 
@@ -78,12 +75,12 @@ exports.deleteCategory = async (req, res) => {
         })
 
         if (result.rowCount == 0) {
-            return res.status(404).json({ error: 'Category not found' })
+            return res.status(404).json({ succes: false, error: 'Category not found' })
         }
 
         return res.status(200).json({ success: true, message: 'Product deleted' })
     } catch (error) {
-        return res.status(500).json({ error: error.message })
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 };
 
@@ -95,11 +92,11 @@ exports.getCategoryById = async (req, res) => {
         })
 
         if (result.rowCount == 0) {
-            return res.status(404).json({ error: 'Category not found' })
+            return res.status(404).json({succes: false, error: 'Category not found' })
         }
 
-        return res.status(200).json(result.rows[0])
+        return res.status(200).json({ succes: true, data: result.rows[0] });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ succes: false, error: 'Server error!' })
     }
 };
