@@ -1,4 +1,3 @@
-const database = require('../services/database')
 
 function validateField(fieldName) {
     return function(req, res) {
@@ -7,5 +6,5 @@ function validateField(fieldName) {
         }
     };
 }  
-          
+
 module.exports = { validateField }
